@@ -1,4 +1,4 @@
-# ASX Clean Manager
+# ASX PC-Cleaner
 
 <div align="center">
   <h1>🧹 Удобная очистка системы</h1>
