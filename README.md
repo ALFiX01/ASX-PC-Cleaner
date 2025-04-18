@@ -1,7 +1,11 @@
 # ASX PC-Cleaner
 
 <div align="center">
-  <h1>🧹 Удобная очистка системы</h1>
+  <a href="https://github.com/ALFiX01/ASX_Hub">
+    <img src="https://github.com/ALFiX01/ASX-PC-Cleaner/blob/main/Files/images/design.png?raw=true" alt="ASX Hub Logo Banner" width="800">
+  </a>
+
+  <br />
 
   <p><strong>Утилита для удаления временных файлов, освобождения дискового пространства и повышения стабильности работы системы.</strong></p>
 
