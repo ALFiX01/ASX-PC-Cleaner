@@ -1,8 +1,8 @@
 # ASX PC-Cleaner
 
 <div align="center">
-  <a href="https://github.com/ALFiX01/ASX_Hub">
-    <img src="https://github.com/ALFiX01/ASX-PC-Cleaner/blob/main/Files/images/design.png?raw=true" alt="ASX Hub Logo Banner" width="800">
+  <a href="https://github.com/ALFiX01/ASX-PC-Cleaner">
+    <img src="https://github.com/ALFiX01/ASX-PC-Cleaner/blob/main/Files/image/design.png?raw=true" alt="ASX Hub Logo Banner" width="800">
   </a>
 
   <br />
