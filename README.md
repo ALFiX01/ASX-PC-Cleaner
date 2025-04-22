@@ -19,7 +19,7 @@
     <a href="https://github.com/ALFiX01/ASX-PC-Cleaner/stargazers">
       <img src="https://img.shields.io/github/stars/ALFiX01/ASX-PC-Cleaner?style=plastic" alt="GitHub Stars">
     </a>
-    <a href="https://github.com/ALFiX01/GoodbyeZapret/releases">
+    <a href="https://github.com/ALFiX01/ASX-PC-Cleaner/releases">
       <img src="https://img.shields.io/github/downloads/ALFiX01/ASX-PC-Cleaner?style=plastic" alt="GitHub Downloads">
     </a>
   </p>
