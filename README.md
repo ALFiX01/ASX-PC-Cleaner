@@ -22,7 +22,6 @@
     <a href="https://github.com/ALFiX01/ASX-PC-Cleaner/releases">
       <img src="https://img.shields.io/github/downloads/ALFiX01/ASX-PC-Cleaner/total?style=plastic" alt="GitHub Downloads">
       
-    </a>
   </p>
 
 ---
