@@ -89,6 +89,6 @@
 
 <div align="center">
   Чистота, порядок и стабильность — с <strong>ASX PC-Cleaner</strong>  
-</div>
+<div align="center">
   Понравился проект? Поддержи его звёздочкой ⭐ на GitHub!
 </div>
