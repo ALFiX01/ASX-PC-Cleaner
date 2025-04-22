@@ -10,14 +10,14 @@
   <p><strong>Утилита для удаления временных файлов, освобождения дискового пространства и повышения стабильности работы системы.</strong></p>
 
   <p>
-    <a href="https://github.com/ALFiX01/ASX_Clean_Manager/releases/latest">
-      <img src="https://img.shields.io/github/v/release/ALFiX01/ASX_Clean_Manager?style=plastic" alt="GitHub Release">
+    <a href="https://github.com/ALFiX01/ASX-PC-Cleaner/releases/latest">
+      <img src="https://img.shields.io/github/v/release/ALFiX01/ASX-PC-Cleaner?style=plastic" alt="GitHub Release">
     </a>
-    <a href="https://github.com/ALFiX01/ASX_Clean_Manager/commits/main">
-      <img src="https://img.shields.io/github/last-commit/ALFiX01/ASX_Clean_Manager?style=plastic" alt="GitHub Last Commit">
+    <a href="https://github.com/ALFiX01/ASX-PC-Cleaner/commits/main">
+      <img src="https://img.shields.io/github/last-commit/ALFiX01/ASX-PC-Cleaner?style=plastic" alt="GitHub Last Commit">
     </a>
-    <a href="https://github.com/ALFiX01/ASX_Clean_Manager/stargazers">
-      <img src="https://img.shields.io/github/stars/ALFiX01/ASX_Clean_Manager?style=plastic" alt="GitHub Stars">
+    <a href="https://github.com/ALFiX01/ASX-PC-Cleaner/stargazers">
+      <img src="https://img.shields.io/github/stars/ALFiX01/ASX-PC-Cleaner?style=plastic" alt="GitHub Stars">
     </a>
   </p>
 </div>
