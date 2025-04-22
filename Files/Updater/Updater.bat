@@ -1,6 +1,6 @@
 ::[Bat To Exe Converter]
 ::
-::YAwzoRdxOk+EWAjk
+::YAwzoRdxOk+EWAnk
 ::fBw5plQjdCuDJOl7RaKA9quH/eQy7NtmtmmtA9RLEVpWEpCtilLtyFVrAoivE9hTwlDmSZ8u2XRmv8QDCBlBeyiqfh0xvSNss3OhMtSVtAGvQ0uGhg==
 ::YAwzuBVtJxjWCl3EqQJgSA==
 ::ZR4luwNxJguZRRnk
@@ -26,7 +26,7 @@
 ::ZQ0/vhVqMQ3MEVWAtB9wSA==
 ::Zg8zqx1/OA3MEVWAtB9wSA==
 ::dhA7pRFwIByZRRnk
-::Zh4grVQjdCyDJGyX8VAjFD9VQg2LMFeeCbYJ5e31+/m7hUQJfPc9RKjU1bCMOeUp61X2cIIR8HNWndgwOQtcfwaufDMBuWpDomGXecKEtm8=
+::Zh4grVQjdCyDJGyX8VAjFD9VQg2LMFeeCbYJ5e31+/m7hUQJfPc9RK7o4vm+A60w5kDle5M/6lxTlM4fMC5IehO/ax0InH5Gt3CAJYmZqwqB
 ::YB416Ek+ZW8=
 ::
 ::
@@ -44,6 +44,39 @@ if %errorlevel% neq 0 (
 setlocal EnableDelayedExpansion
 
 mode con: cols=80 lines=25 >nul 2>&1
+
+REM Установка переменной Directory
+reg query "HKCU\Software\ALFiX inc.\ASX\Settings" /v "Directory" >nul 2>&1
+if errorlevel 1 (
+    REM Если ключ не существует, создаем его и директорию
+    if not exist "%ProgramFiles%" (
+        echo Ошибка 02: Директория Program Files не найдена.
+        echo Проверьте целостность системы Windows.
+        pause
+        exit /b 1
+    )
+    reg add "HKCU\Software\ALFiX inc.\ASX\Settings" /t REG_SZ /v "Directory" /d "%ProgramFiles%\ASX" /f >nul 2>&1
+    set "ASX-Directory=%ProgramFiles%\ASX"
+    
+    REM Создаем структуру директорий
+    if not exist "!ASX-Directory!\Files\Logs" (
+        md "!ASX-Directory!\Files\Logs" >nul 2>&1
+    )
+) else (
+    REM Если ключ существует, получаем значение
+    for /f "tokens=2*" %%a in ('reg query "HKCU\Software\ALFiX inc.\ASX\Settings" /v "Directory" 2^>nul ^| find /i "Directory"') do set "ASX-Directory=%%b"
+    
+    if not exist "!ASX-Directory!" (
+        REM Если директория не существует, создаем ее и устанавливаем флаг первого запуска
+        md "!ASX-Directory!\Files\Logs" >nul 2>&1
+        set "SaveData=HKEY_CURRENT_USER\Software\ALFiX inc.\ASX\Data"
+        call:ASX_First_launch
+        echo [INFO ] %TIME% - Создана директория !ASX-Directory! >> "!ASX-Directory!\Files\Logs\%date%.txt"
+    ) else (
+        REM Проверка структуры директорий
+        if not exist "!ASX-Directory!\Files\Temp" md "!ASX-Directory!\Files\Temp" >nul 2>&1
+    )
+)
 
 set "UpdaterVersion=1.1"
 
@@ -69,32 +102,25 @@ echo.
 
 
 echo         ^[*^] Скачивание файлов
-curl -g -L -# -o %TEMP%\GoodbyeZapret.zip "https://github.com/ALFiX01/GoodbyeZapret/raw/refs/heads/main/Files/GoodbyeZapret.zip" >nul 2>&1
+curl -g -L -# -o "%TEMP%\ASX-PC-Cleaner.exe" "https://github.com/ALFiX01/ASX-PC-Cleaner/raw/refs/heads/main/Files/PC_cleaner/ASX-PC-Cleaner.exe" >nul 2>&1
 
-for %%I in ("%TEMP%\GoodbyeZapret.zip") do set FileSize=%%~zI
+for %%I in ("%TEMP%\ASX-PC-Cleaner.exe") do set FileSize=%%~zI
 if %FileSize% LSS 100 (
     echo       %COL%[91m ^[*^] Error - Файл GoodbyeZapret.zip поврежден или URL не доступен ^(Size %FileSize%^) %COL%[90m
     pause
-    del /Q "%TEMP%\GoodbyeZapret.zip"
+    del /Q "%TEMP%\ASX-PC-Cleaner.exe"
     exit
 )
 
 
-if exist "%SystemDrive%\GoodbyeZapret" (
-  rd /s /q "%SystemDrive%\GoodbyeZapret" >nul 2>&1
+if exist "%ASX-Directory%\Files\Utilites\PC_Cleaner\ASX-PC-Cleaner.exe" (
+  rd /s /q "%ASX-Directory%\Files\Utilites\PC_Cleaner\ASX-PC-Cleaner.exe" >nul 2>&1
 )
 
-if exist "%TEMP%\GoodbyeZapret.zip" (
-    echo         ^[*^] Распаковка файлов
-    chcp 850 >nul 2>&1
-    powershell -NoProfile Expand-Archive '%TEMP%\GoodbyeZapret.zip' -DestinationPath '%SystemDrive%\GoodbyeZapret' >nul 2>&1
-    chcp 65001 >nul 2>&1
-) else (
-    echo        %COL%[91m ^[*^] Error: File not found: %TEMP%\GoodbyeZapret.zip %COL%[90m
-    timeout /t 5 >nul
-    exit
+if exist "%TEMP%\ASX-PC-Cleaner.exe" (
+    move /Y "%TEMP%\ASX-PC-Cleaner.exe" "%ASX-Directory%\Files\Utilites\PC_Cleaner\ASX-PC-Cleaner.exe"
 )
 
 
-start "" "%SystemDrive%\GoodbyeZapret\Launcher.exe"
+start "" "%ASX-Directory%\Files\Utilites\PC_Cleaner\ASX-PC-Cleaner.exe"
 exit
