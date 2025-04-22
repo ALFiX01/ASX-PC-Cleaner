@@ -170,14 +170,14 @@ if errorlevel 1 (
 :ASX_cleaner
 if not exist "%ASX-Directory%\Files\Logs\ASX_cleaner" md "%ASX-Directory%\Files\Logs\ASX_cleaner" >nul 2>&1
 cls
-TITLE ASX PC Cleaner %version% beta
+TITLE ASX PC Cleaner %version% Alpha
 echo.
 echo.
 echo                               %COL%[90m____  ______            ________
 echo                              / __ \/ ____/           / ____/ /__  ____ _____  ___  _____
 echo                             / /_/ / /      ______   / /   / / _ \/ __ `/ __ \/ _ \/ ___/
 echo                            / ____/ /___   /_____/  / /___/ /  __/ /_/ / / / /  __/ / 
-echo                           /_/    \____/            \____/_/\___/\__,_/_/ /_/\___/_/ %COL%[36mbeta%COL%[90m
+echo                           /_/    \____/            \____/_/\___/\__,_/_/ /_/\___/_/ %COL%[36mAlpha%COL%[90m
 echo.
 echo                    Утилита для удаления временных файлов, освобождения дискового пространства
 echo.
@@ -555,7 +555,7 @@ set /a diff=%free2mb% - %free1mb%
 
 timeout 1 /nobreak >nul
 cls
-TITLE ASX PC Cleaner %version% beta
+TITLE ASX PC Cleaner %version% Alpha
 
 echo.
 echo.
@@ -563,7 +563,7 @@ echo                               %COL%[90m____  ______            ________
 echo                              / __ \/ ____/           / ____/ /__  ____ _____  ___  _____
 echo                             / /_/ / /      ______   / /   / / _ \/ __ `/ __ \/ _ \/ ___/
 echo                            / ____/ /___   /_____/  / /___/ /  __/ /_/ / / / /  __/ / 
-echo                           /_/    \____/            \____/_/\___/\__,_/_/ /_/\___/_/ %COL%[36mbeta%COL%[90m
+echo                           /_/    \____/            \____/_/\___/\__,_/_/ /_/\___/_/ %COL%[36mAlpha%COL%[90m
 echo.
 echo         %COL%[37mОтчет о проделанной очистке%COL%[37m
 echo         ---------------------------
@@ -612,7 +612,7 @@ echo                               %COL%[90m____  ______            ________
 echo                              / __ \/ ____/           / ____/ /__  ____ _____  ___  _____
 echo                             / /_/ / /      ______   / /   / / _ \/ __ `/ __ \/ _ \/ ___/
 echo                            / ____/ /___   /_____/  / /___/ /  __/ /_/ / / / /  __/ / 
-echo                           /_/    \____/            \____/_/\___/\__,_/_/ /_/\___/_/ %COL%[36mbeta%COL%[90m
+echo                           /_/    \____/            \____/_/\___/\__,_/_/ /_/\___/_/ %COL%[36mAlpha%COL%[90m
 echo.
 echo.
 TITLE Доступно обновление v%UPDVER%
