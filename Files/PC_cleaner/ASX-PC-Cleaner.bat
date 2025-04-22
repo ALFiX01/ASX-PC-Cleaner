@@ -668,7 +668,7 @@ echo.
 %SYSTEMROOT%\System32\choice.exe /c:YяNт /n /m "%DEL%                                                    >: "
 set choice=!errorlevel!
 if !choice! == 1 ( echo Загрузка обновления...
-        curl -g -L -# -o %TEMP%\ASX-Updater.exe "https://github.com/ALFiX01/ASX-Hub/raw/main/Files/Updater/ASX-Updater.exe" >nul 2>&1
+        curl -g -L -# -o %TEMP%\ASX-Updater.exe "https://github.com/ALFiX01/ASX-PC-Cleaner/raw/refs/heads/main/Files/Updater/Updater.exe" >nul 2>&1
 		IF %ERRORLEVEL% NEQ 0 (
         echo Ошибка: Не удалось скачать файл ASX-Updater.exe. Проверьте подключение к интернету и доступность URL.
 		echo [ERROR] %TIME% - Ошибка при загрузке ASX-Updater.exe >> "%ASX-Directory%\Files\Logs\%date%.txt"
