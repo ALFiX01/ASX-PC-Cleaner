@@ -76,7 +76,6 @@
 
 - Сообщай об ошибках: [Создать Issue](https://github.com/ALFiX01/ASX_Clean_Manager/issues)
 - Предлагай улучшения
-- Делай форк, добавляй фичи и присылай Pull Request
 
 ---
 
