@@ -668,36 +668,16 @@ echo.
 %SYSTEMROOT%\System32\choice.exe /c:YяNт /n /m "%DEL%                                                    >: "
 set choice=!errorlevel!
 if !choice! == 1 ( echo Загрузка обновления...
-        curl -g -L -# -o %TEMP%\ASX-Updater.exe "https://github.com/ALFiX01/ASX-PC-Cleaner/raw/refs/heads/main/Files/Updater/Updater.exe" >nul 2>&1
-		IF %ERRORLEVEL% NEQ 0 (
-        echo Ошибка: Не удалось скачать файл ASX-Updater.exe. Проверьте подключение к интернету и доступность URL.
-		echo [ERROR] %TIME% - Ошибка при загрузке ASX-Updater.exe >> "%ASX-Directory%\Files\Logs\%date%.txt"
-		exit
-    	)
+        curl -g -L -# -o "%TEMP%\PC-Cleaner_Updater.exe" "https://github.com/ALFiX01/ASX-PC-Cleaner/raw/main/Files/Updater/PC-Cleaner_Updater.exe"
         echo [INFO ] %TIME% - Обновление %UPDVER% скачано >> "%ASX-Directory%\Files\Logs\%date%.txt"
-        start %TEMP%\ASX-Updater.exe
+        start "" "%TEMP%\PC-Cleaner_Updater.exe"
         exit
 )
-if !choice! == 2 (
-		call :TYPEFast "                                                           Загрузка обновления..."
-		timeout /t 1 /nobreak > nul
-		echo.
-		echo.
-		echo.
-		echo.
-		echo.
-		echo.	
-		reg add "HKCU\Software\ALFiX inc.\ASX" /t REG_SZ /v "SlientMode" /d "No" /f >nul 2>&1		
-        reg add "HKCU\Software\ALFiX inc.\ASX" /t REG_SZ /v "LastLaunchUpdateInstalled" /d "Yes" /f >nul 2>&1	
-        curl -g -L -# -o %TEMP%\ASX-Updater.exe "https://github.com/ALFiX01/ASX-Hub/raw/main/Files/Updater/ASX-Updater.exe" >nul 2>&1
-		IF %ERRORLEVEL% NEQ 0 (
-        echo Ошибка: Не удалось скачать файл ASX-Updater.exe. Проверьте подключение к интернету и доступность URL.
-		echo [ERROR] %TIME% - Ошибка при загрузке ASX-Updater.exe >> "%ASX-Directory%\Files\Logs\%date%.txt"
-		exit
-    	)
+if !choice! == 2 ( echo Загрузка обновления...
+        curl -g -L -# -o "%TEMP%\PC-Cleaner_Updater.exe" "https://github.com/ALFiX01/ASX-PC-Cleaner/raw/main/Files/Updater/PC-Cleaner_Updater.exe"
         echo [INFO ] %TIME% - Обновление %UPDVER% скачано >> "%ASX-Directory%\Files\Logs\%date%.txt"
-        start %TEMP%\ASX-Updater.exe
-		exit
+        start "" "%TEMP%\PC-Cleaner_Updater.exe"
+        exit
 )
 if !choice! == 3 (
 	title Загрузка	
