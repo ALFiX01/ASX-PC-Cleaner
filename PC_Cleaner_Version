@@ -1,0 +1,4 @@
+set "VersionNumberList=AP21S1 AP21S2"
+set "UPDVER=0.1.0"
+set "FullVersionName=0.1.0"
+set StatusProject=1

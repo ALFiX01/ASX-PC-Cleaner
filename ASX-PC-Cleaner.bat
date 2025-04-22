@@ -4,9 +4,10 @@
 :: Any tampering with the program code is forbidden (Запрещены любые вмешательства)
 
 :: Запуск от имени администратора
-reg add HKLM /F >nul 2>&1
+net session >nul 2>&1
 if %errorlevel% neq 0 (
-    start "" /wait /I /min powershell -NoProfile -Command "start -verb runas '%~s0'" 
+    echo Requesting administrative privileges...
+    start "" /wait /I /min powershell -NoProfile -Command "Start-Process -FilePath '%~s0' -Verb RunAs"
     exit /b
 )
 
@@ -27,7 +28,13 @@ chcp 65001 >nul 2>&1
 setlocal EnableDelayedExpansion
 
 REM ИНФОРМАЦИЯ О ВЕРСИИ
-set "Version=1.0"
+set "Version=0.1.0"
+set "VersionNumberCurrent=AP21S1"
+
+set "VersionNumberList=Erorr"
+set "UPDVER=Erorr"
+set "FullVersionName=Erorr"
+set StatusProject=1
 
 REM Установка переменной Directory
 reg query "HKCU\Software\ALFiX inc.\ASX\Settings" /v "Directory" >nul 2>&1
@@ -53,7 +60,6 @@ if errorlevel 1 (
     if not exist "!ASX-Directory!" (
         REM Если директория не существует, создаем ее и устанавливаем флаг первого запуска
         md "!ASX-Directory!\Files\Logs" >nul 2>&1
-        reg add "HKCU\Software\ALFiX inc.\ASX\Settings" /v "Firstlaunch" /t REG_SZ /d "Yes" /f >nul 2>&1
         set "SaveData=HKEY_CURRENT_USER\Software\ALFiX inc.\ASX\Data"
         call:ASX_First_launch
         echo [INFO ] %TIME% - Создана директория !ASX-Directory! >> "!ASX-Directory!\Files\Logs\%date%.txt"
@@ -63,6 +69,7 @@ if errorlevel 1 (
     )
 )
 
+
 REM Цветной текст
 for /F "tokens=1,2 delims=#" %%a in ('"prompt #$H#$E# & echo on & for %%b in (1) do rem"') do (set "DEL=%%a" & set "COL=%%b")
 
@@ -71,8 +78,97 @@ echo. >> "!ASX-Directory!\Files\Logs\%date%.txt"
 echo 📌 Запуск ASX PC Cleaner >> "!ASX-Directory!\Files\Logs\%date%.txt"
 
 
-:ASX_cleaner
+REM ----- ОБНОВЛЕНИЯ -----
+:UpdateCheck
+echo [INFO ] %TIME% - Проверка обновлений ASX PC Cleaner >> "%ASX-Directory%\Files\Logs\%date%.txt"
 
+:: Разделение версии на Major, Minor и Patch
+for /f "tokens=1-3 delims=." %%a in ("%Version%") do (
+    set "Major=%%a"
+    set "Minor=%%b"
+    set "Patch=%%c"
+)
+
+:: Если Patch равен нулю, установить версию без Patch
+if "%Patch%"=="0" set "Version=%Major%.%Minor%"
+
+:: Проверка подключения к интернету
+ping -n 1 google.ru >nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    echo [WARN ] %TIME% - Соединение с интернетом отсутствует >> "%ASX-Directory%\Files\Logs\%date%.txt"
+    set "WiFi=Off"    
+    goto loading_procces    
+) else (
+    set "WiFi=On"        
+)
+
+:: Получение текущей версии PC_Cleaner из реестра
+for /f "tokens=2*" %%a in ('reg query "HKCU\Software\ALFiX inc.\PC_Cleaner" /v "PC_Cleaner_Version" 2^>nul ^| find /i "PC_Cleaner_Version"') do set "PC_Cleaner_Version_OLD=%%b"
+
+if not exist "%ASX-Directory%\Files\Utilites\PC_Cleaner" md "%ASX-Directory%\Files\Utilites\PC_Cleaner"
+:: Загрузка и регистрация PC_CleanerUpdater
+if exist "%TEMP%\Updater.bat" del /s /q /f "%TEMP%\Updater.bat" >nul 2>&1
+curl -s -o "%TEMP%\Updater.bat" "https://raw.githubusercontent.com/ALFiX01/ASX-Hub/main/Files/ASX/%FileVerCheckName%" 
+if errorlevel 1 (
+    echo [ERROR] %TIME% - Ошибка связи с сервером проверки обновлений >> "%ASX-Directory%\Files\Logs\%date%.txt"
+    goto loading_procces
+)
+
+TITLE Проверка обновлений
+
+:: Загрузка нового файла Updater.bat
+if exist "%TEMP%\Updater.bat" del /s /q /f "%TEMP%\Updater.bat" >nul 2>&1
+curl -s -o "%TEMP%\Updater.bat" "https://raw.githubusercontent.com/ALFiX01/ASX-Hub/main/Files/ASX/%FileVerCheckName%" 
+if errorlevel 1 (
+    echo [ERROR] %TIME% - Ошибка связи с сервером проверки обновлений >> "%ASX-Directory%\Files\Logs\%date%.txt"
+    goto loading_procces
+)
+
+:: Проверка успешной загрузки файла
+if not exist "%TEMP%\Updater.bat" (
+    echo [ERROR] %TIME% - Файл Updater.bat не был загружен >> "%ASX-Directory%\Files\Logs\%date%.txt"
+    goto loading_procces
+)
+
+:: Проверка размера файла (если файл пустой, то пропускаем)
+for %%A in ("%TEMP%\Updater.bat") do if %%~zA equ 0 (
+    echo [ERROR] %TIME% - Загруженный файл Updater.bat пуст >> "%ASX-Directory%\Files\Logs\%date%.txt"
+    goto loading_procces
+)
+
+:: Выполнение загруженного файла Updater.bat
+call "%TEMP%\Updater.bat" >nul 2>&1
+if errorlevel 1 (
+    echo [ERROR] %TIME% - Ошибка при выполнении Updater.bat >> "%ASX-Directory%\Files\Logs\%date%.txt"
+    goto loading_procces
+)
+
+:: Проверка, определены ли переменные после выполнения Updater.bat
+if not defined UPDVER (
+    echo [ERROR] %TIME% - Переменная UPDVER не определена после выполнения Updater.bat >> "%ASX-Directory%\Files\Logs\%date%.txt"
+    goto loading_procces
+)
+
+if not defined VersionNumberList (
+    echo [ERROR] %TIME% - Переменная VersionNumberList не определена после выполнения Updater.bat >> "%ASX-Directory%\Files\Logs\%date%.txt"
+    goto loading_procces
+)
+
+:: Проверка, изменилась ли версия
+echo "%VersionNumberList%" | findstr /i "%VersionNumberCurrent%" >nul
+if errorlevel 1 (
+    echo [INFO ] %TIME% - Доступно обновление v%UPDVER% >> "%ASX-Directory%\Files\Logs\%date%.txt"    
+    goto Update_screen
+) else (
+    set "VersionFound=1"
+    title Загрузка...
+    echo [INFO ] %TIME% - Отсутствуют доступные обновления >> "%ASX-Directory%\Files\Logs\%date%.txt"
+    goto loading_procces
+)
+
+
+:loading_procces
+:ASX_cleaner
 if not exist "%ASX-Directory%\Files\Logs\ASX_cleaner" md "%ASX-Directory%\Files\Logs\ASX_cleaner" >nul 2>&1
 cls
 TITLE ASX PC Cleaner %version% beta
@@ -481,7 +577,7 @@ echo         ---------------------------
 echo.
 echo         %COL%[92mПроцесс очистки завершен
 echo         %COL%[93mУдалено %DelFileCount% файлов и %DelFolderCount% папок%COL%[37m
-echo         %COL%[92mОчищено места: %diff% МБ
+echo         %COL%[92mОчищено места: ~%diff% МБ
 echo         %COL%[31mПроизошло ошибок: %ErrorCount%%COL%[37m
 echo.
 echo.
@@ -496,7 +592,7 @@ echo [INFO ] %TIME% - Отчет о проделанной очистки >> "%A
 echo [INFO ] %TIME% - Удалено %DelFileCount% файлов и %DelFolderCount% папок >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
 echo [INFO ] %TIME% - Всего ошибок при удалении файлов/папок: %ErrorCount% >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
 echo [INFO ] %TIME% - Завершено ASX_cleaner >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-
+goto ASX_cleaner
 
 :DelDirectory
 REM Безопасное удаление директории и её содержимого
@@ -513,3 +609,86 @@ if exist "%~1\" (
     echo [INFO ] - Директория не найдена, пропускаем: %~1
 )
 goto :eof
+
+
+:Update_screen
+cls
+echo.
+echo.
+echo                               %COL%[90m____  ______            ________
+echo                              / __ \/ ____/           / ____/ /__  ____ _____  ___  _____
+echo                             / /_/ / /      ______   / /   / / _ \/ __ `/ __ \/ _ \/ ___/
+echo                            / ____/ /___   /_____/  / /___/ /  __/ /_/ / / / /  __/ / 
+echo                           /_/    \____/            \____/_/\___/\__,_/_/ /_/\___/_/ %COL%[36mbeta%COL%[90m
+echo.
+echo.
+TITLE Доступно обновление v%UPDVER%
+echo [INFO ] %TIME% - Доступно обновление v%UPDVER% >> "%ASX-Directory%\Files\Logs\%date%.txt"	
+echo                                                       Для ASX Hub доступно обновление%COL%[36m v%UPDVER%
+echo.
+echo                                                                  Хотите обновить?
+
+echo.
+echo.
+echo.
+echo                                                      %COL%[92mY - Обновить       %COL%[37m^|%COL%[91m       N - Не обновлять
+echo %COL%[90m
+echo.
+echo.
+%SYSTEMROOT%\System32\choice.exe /c:YяNт /n /m "%DEL%                                                                     >: "
+set choice=!errorlevel!
+if !choice! == 1 ( echo Загрузка обновления...
+        echo.
+        echo.
+        echo.
+        echo.
+        echo.
+        echo.
+		reg add "HKCU\Software\ALFiX inc.\ASX" /t REG_SZ /v "SlientMode" /d "No" /f >nul 2>&1
+        reg add "HKCU\Software\ALFiX inc.\ASX" /t REG_SZ /v "LastLaunchUpdateInstalled" /d "Yes" /f >nul 2>&1
+        curl -g -L -# -o %TEMP%\ASX-Updater.exe "https://github.com/ALFiX01/ASX-Hub/raw/main/Files/Updater/ASX-Updater.exe" >nul 2>&1
+		IF %ERRORLEVEL% NEQ 0 (
+        echo Ошибка: Не удалось скачать файл ASX-Updater.exe. Проверьте подключение к интернету и доступность URL.
+		echo [ERROR] %TIME% - Ошибка при загрузке ASX-Updater.exe >> "%ASX-Directory%\Files\Logs\%date%.txt"
+		exit
+    	)
+        echo [INFO ] %TIME% - Обновление %UPDVER% скачано >> "%ASX-Directory%\Files\Logs\%date%.txt"
+        start %TEMP%\ASX-Updater.exe
+        exit
+)
+if !choice! == 2 (
+		call :TYPEFast "                                                           Загрузка обновления..."
+		timeout /t 1 /nobreak > nul
+		echo.
+		echo.
+		echo.
+		echo.
+		echo.
+		echo.	
+		reg add "HKCU\Software\ALFiX inc.\ASX" /t REG_SZ /v "SlientMode" /d "No" /f >nul 2>&1		
+        reg add "HKCU\Software\ALFiX inc.\ASX" /t REG_SZ /v "LastLaunchUpdateInstalled" /d "Yes" /f >nul 2>&1	
+        curl -g -L -# -o %TEMP%\ASX-Updater.exe "https://github.com/ALFiX01/ASX-Hub/raw/main/Files/Updater/ASX-Updater.exe" >nul 2>&1
+		IF %ERRORLEVEL% NEQ 0 (
+        echo Ошибка: Не удалось скачать файл ASX-Updater.exe. Проверьте подключение к интернету и доступность URL.
+		echo [ERROR] %TIME% - Ошибка при загрузке ASX-Updater.exe >> "%ASX-Directory%\Files\Logs\%date%.txt"
+		exit
+    	)
+        echo [INFO ] %TIME% - Обновление %UPDVER% скачано >> "%ASX-Directory%\Files\Logs\%date%.txt"
+        start %TEMP%\ASX-Updater.exe
+		exit
+)
+if !choice! == 3 (
+	title Загрузка	
+	set NoUpd=1
+	call:loading_screen
+	) else (
+	echo [INFO ] %TIME% - Пользователь отказался от загрузки Обновления %UPDVER% >> "%ASX-Directory%\Files\Logs\%date%.txt"
+)
+if !choice! == 4 (
+	title Загрузка	
+	set NoUpd=1
+	call:loading_screen
+	) else (
+	echo [INFO ] %TIME% - Пользователь отказался от загрузки Обновления %UPDVER% >> "%ASX-Directory%\Files\Logs\%date%.txt"
+)
+call:Update_screen
