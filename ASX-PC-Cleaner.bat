@@ -97,7 +97,7 @@ ping -n 1 google.ru >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
     echo [WARN ] %TIME% - Соединение с интернетом отсутствует >> "%ASX-Directory%\Files\Logs\%date%.txt"
     set "WiFi=Off"    
-    goto loading_procces    
+    goto ASX_cleaner    
 ) else (
     set "WiFi=On"        
 )
@@ -111,7 +111,7 @@ if exist "%TEMP%\Updater.bat" del /s /q /f "%TEMP%\Updater.bat" >nul 2>&1
 curl -s -o "%TEMP%\Updater.bat" "https://raw.githubusercontent.com/ALFiX01/ASX-Hub/main/Files/ASX/%FileVerCheckName%" 
 if errorlevel 1 (
     echo [ERROR] %TIME% - Ошибка связи с сервером проверки обновлений >> "%ASX-Directory%\Files\Logs\%date%.txt"
-    goto loading_procces
+    goto ASX_cleaner
 )
 
 TITLE Проверка обновлений
@@ -121,37 +121,37 @@ if exist "%TEMP%\Updater.bat" del /s /q /f "%TEMP%\Updater.bat" >nul 2>&1
 curl -s -o "%TEMP%\Updater.bat" "https://raw.githubusercontent.com/ALFiX01/ASX-Hub/main/Files/ASX/%FileVerCheckName%" 
 if errorlevel 1 (
     echo [ERROR] %TIME% - Ошибка связи с сервером проверки обновлений >> "%ASX-Directory%\Files\Logs\%date%.txt"
-    goto loading_procces
+    goto ASX_cleaner
 )
 
 :: Проверка успешной загрузки файла
 if not exist "%TEMP%\Updater.bat" (
     echo [ERROR] %TIME% - Файл Updater.bat не был загружен >> "%ASX-Directory%\Files\Logs\%date%.txt"
-    goto loading_procces
+    goto ASX_cleaner
 )
 
 :: Проверка размера файла (если файл пустой, то пропускаем)
 for %%A in ("%TEMP%\Updater.bat") do if %%~zA equ 0 (
     echo [ERROR] %TIME% - Загруженный файл Updater.bat пуст >> "%ASX-Directory%\Files\Logs\%date%.txt"
-    goto loading_procces
+    goto ASX_cleaner
 )
 
 :: Выполнение загруженного файла Updater.bat
 call "%TEMP%\Updater.bat" >nul 2>&1
 if errorlevel 1 (
     echo [ERROR] %TIME% - Ошибка при выполнении Updater.bat >> "%ASX-Directory%\Files\Logs\%date%.txt"
-    goto loading_procces
+    goto ASX_cleaner
 )
 
 :: Проверка, определены ли переменные после выполнения Updater.bat
 if not defined UPDVER (
     echo [ERROR] %TIME% - Переменная UPDVER не определена после выполнения Updater.bat >> "%ASX-Directory%\Files\Logs\%date%.txt"
-    goto loading_procces
+    goto ASX_cleaner
 )
 
 if not defined VersionNumberList (
     echo [ERROR] %TIME% - Переменная VersionNumberList не определена после выполнения Updater.bat >> "%ASX-Directory%\Files\Logs\%date%.txt"
-    goto loading_procces
+    goto ASX_cleaner
 )
 
 :: Проверка, изменилась ли версия
@@ -163,11 +163,10 @@ if errorlevel 1 (
     set "VersionFound=1"
     title Загрузка...
     echo [INFO ] %TIME% - Отсутствуют доступные обновления >> "%ASX-Directory%\Files\Logs\%date%.txt"
-    goto loading_procces
+    goto ASX_cleaner
 )
 
 
-:loading_procces
 :ASX_cleaner
 if not exist "%ASX-Directory%\Files\Logs\ASX_cleaner" md "%ASX-Directory%\Files\Logs\ASX_cleaner" >nul 2>&1
 cls
@@ -219,7 +218,7 @@ set /a ErrorCount=0
 echo                            %COL%[37mНажмите любую клавишу, чтобы запустить процесс очистки...
 echo.
 pause >nul
-echo   %COL%[96mЗапускаю процесс очистки...%COL%[37
+echo   %COL%[96mЗапускаю процесс очистки... %COL%[37m
 echo.
 title Очистка [1/3]
 echo. >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
@@ -309,7 +308,49 @@ chcp 65001 >nul 2>&1
 
 rem удаление файлов
 
-for %%a in ("%WinDir%\Temp\*.*" "%systemdrive%*.tmp" "%systemdrive%*._mp" "%systemdrive%*.gid" "%SYSTEMDRIVE%\AMD\*.*" "%SYSTEMDRIVE%\NVIDIA\*.*" "%SYSTEMDRIVE%\INTEL\*.*" "%LocalAppData%\Microsoft\Windows\Explorer\thumbcache_*.db" "%LocalAppData%\Microsoft\Windows\Explorer\*.db" "%systemdrive%\*.log" "%systemdrive%\*.old" "%windir%\*.bak" "%windir%\Logs\CBS\CbsPersist*.log" "%windir%\Logs\MoSetup\*.log" "%windir%\Panther\*.log" "%windir%\logs\*.log" "%systemdrive%\*.trace" "%WinDir%\Prefetch\*.*" "%Temp%\*.*" "%AppData%\Temp\*.*" "%AppData%\Microsoft\Windows\Recent\*" "%HomePath%\AppData\LocalLow\Temp\*.*" "%LocalAppData%\Microsoft\Windows\INetCache\." "%AppData%\Local\Microsoft\Windows\INetCookies\." "%AppData%\Discord\Cache\." "%AppData%\Discord\Code Cache\." "%ProgramFiles(x86)%\Steam\Dumps" "%ProgramFiles(x86)%\Steam\Traces" "%ProgramFiles(x86)%\Steam\appcache\*.log" "%localappdata%\Microsoft\Windows\WebCache\*.log" "%ProgramData%\Microsoft\Windows Defender\Network Inspection System\Support\*.log" "%ProgramData%\Microsoft\Windows Defender\Scans\History\CacheManager" "%ProgramData%\Microsoft\Windows Defender\Scans\History\ReportLatency\Latency" "%ProgramData%\Microsoft\Windows Defender\Scans\History\Service\*.log" "%ProgramData%\Microsoft\Windows Defender\Scans\MetaStore" "%ProgramData%\Microsoft\Windows Defender\Support" "%ProgramData%\Microsoft\Windows Defender\Scans\History\Results\Quick" "%ProgramData%\Microsoft\Windows Defender\Scans\History\Results\Resource" "%windir%\Minidump\*.dmp" "%localappdata%\CrashDumps\*.dmp" ) do (
+for %%a in (
+    "%WinDir%\Temp\*.*"
+    "%systemdrive%*.tmp"
+    "%systemdrive%*._mp"
+    "%systemdrive%*.gid"
+    "%SYSTEMDRIVE%\AMD\*.*"
+    "%SYSTEMDRIVE%\NVIDIA\*.*"
+    "%SYSTEMDRIVE%\INTEL\*.*"
+    "%LocalAppData%\Microsoft\Windows\Explorer\thumbcache_*.db"
+    "%LocalAppData%\Microsoft\Windows\Explorer\*.db"
+    "%systemdrive%\*.log"
+    "%systemdrive%\*.old"
+    "%windir%\*.bak"
+    "%windir%\Logs\CBS\CbsPersist*.log"
+    "%windir%\Logs\MoSetup\*.log" "%windir%\Panther\*.log"
+    "%windir%\logs\*.log" "%systemdrive%\*.trace"
+    "%WinDir%\Prefetch\*.*"
+    "%Temp%\*.*"
+    "%AppData%\Temp\*.*"
+    "%AppData%\Microsoft\Windows\Recent\*"
+    "%HomePath%\AppData\LocalLow\Temp\*.*"
+    "%LocalAppData%\Microsoft\Windows\INetCache\."
+    "%AppData%\Local\Microsoft\Windows\INetCookies\."
+    "%AppData%\Discord\Cache\."
+    "%AppData%\Discord\Code Cache\."
+    "%ProgramFiles(x86)%\Steam\Dumps"
+    "%ProgramFiles(x86)%\Steam\Traces"
+    "%ProgramFiles(x86)%\Steam\appcache\*.log"
+    "%localappdata%\Microsoft\Windows\WebCache\*.log"
+    "%ProgramData%\Microsoft\Windows Defender\Network Inspection System\Support\*.log"
+    "%ProgramData%\Microsoft\Windows Defender\Scans\History\CacheManager"
+    "%ProgramData%\Microsoft\Windows Defender\Scans\History\ReportLatency\Latency"
+    "%ProgramData%\Microsoft\Windows Defender\Scans\History\Service\*.log" 
+    "%ProgramData%\Microsoft\Windows Defender\Scans\MetaStore"
+    "%ProgramData%\Microsoft\Windows Defender\Support"
+    "%ProgramData%\Microsoft\Windows Defender\Scans\History\Results\Quick"
+    "%ProgramData%\Microsoft\Windows Defender\Scans\History\Results\Resource"
+    "%windir%\Minidump\*.dmp"
+    "%windir%\LiveKernelReports\*.dmp"
+    "%windir%\LiveKernelReports\WATCHDOG\*.dmp"
+    "%windir%\LiveKernelReports\WHEA\*.dmp"
+    "%localappdata%\CrashDumps\*.dmp"
+) do (
     if exist "%%a" (
         del /s /f /q "%%a" >nul 2>&1
         if !errorlevel! equ 0 (
@@ -328,67 +369,51 @@ for %%a in ("%WinDir%\Temp\*.*" "%systemdrive%*.tmp" "%systemdrive%*._mp" "%syst
 )
 
 title Очистка [2/3]
-rem удаление папок 
-echo [INFO ] %TIME% - Очистка [2/3] запущена >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-for %%a in ("%WinDir%\Temp" "%WinDir%\Prefetch" "%Temp%" "%AppData%\Temp" "%systemdrive%\windows.old" "%ASX-Directory%\Files\Downloads" "%SystemDrive%\OneDriveTemp" "%ProgramData%\Microsoft\Diagnosis" "%ProgramData%\Microsoft\Network" "%ProgramData%\Microsoft\Search" "%LocalAppData%\Microsoft\Windows\AppCache" "%LocalAppData%\Microsoft\Windows\History" "%LocalAppData%\Microsoft\Windows\WebCache" "%ProgramFiles(x86)%\Steam\logs") do (
+set "LogFile=%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
+
+for %%a in (
+    "%WinDir%\Temp" 
+    "%WinDir%\Prefetch" 
+    "%Temp%" 
+    "%AppData%\Temp" 
+    "%systemdrive%\windows.old" 
+    "%ASX-Directory%\Files\Downloads" 
+    "%SystemDrive%\OneDriveTemp" 
+    "%ProgramData%\Microsoft\Diagnosis" 
+    "%ProgramData%\Microsoft\Network" 
+    "%ProgramData%\Microsoft\Search" 
+    "%LocalAppData%\Microsoft\Windows\AppCache" 
+    "%LocalAppData%\Microsoft\Windows\History" 
+    "%LocalAppData%\Microsoft\Windows\WebCache" 
+    "%ProgramFiles(x86)%\Steam\logs"
+) do (
     if exist "%%a" (
-        rmdir /s /q "%%a" >nul 2>&1
-        md %%a >nul 2>&1
+        echo [INFO ] - Удаление файлов в папке: %%a
+        del /s /q "%%a\*.*" >nul 2>&1
         if !errorlevel! equ 0 (
-            echo [INFO ] - Папка очищена: %%a
-            echo [INFO ] %TIME% - Папка %%a очищена >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-            set /a DelFolderCount+=1
+            echo [INFO ] - Файлы в папке %%a успешно удалены
+            echo [INFO ] %TIME% - Файлы в папке %%a успешно удалены >> %LogFile%
+            set /a DelFileCount+=1
         ) else (
-            echo [ERROR] - Папка %%a не может быть очищена
-            echo [ERROR] %TIME% - Папка %%a не может быть очищена >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
+            echo [ERROR] - Не удалось удалить файлы в папке: %%a
+            echo [ERROR] %TIME% - Не удалось удалить файлы в папке %%a >> %LogFile%
             set /a ErrorCount+=1
         )
     ) else (
         echo [WARN ] - Папка %%a не существует
-        echo [WARN ] %TIME% - Папка %%a не существует >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
+        echo [WARN ] %TIME% - Папка %%a не существует >> %LogFile%
     )
 )
 
-
-rem Очистка папки Центра обновления Windows
-net stop wuauserv >nul 2>&1
-if !errorlevel! equ 0 (
-    echo [INFO ] - Служба Windows Update успешно остановлена
-    echo [INFO ] %TIME% - Служба Windows Update успешно остановлена >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-) else (
-    echo [ERROR] - Ошибка при остановке службы Windows Update
-    echo [ERROR] %TIME% - Ошибка при остановке службы Windows Update >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-    set /a ErrorCount+=1
-)
-
-net stop cryptSvc >nul 2>&1
-if !errorlevel! equ 0 (
-    echo [INFO ] - Служба Cryptographic Services успешно остановлена
-    echo [INFO ] %TIME% - Служба Cryptographic Services успешно остановлена >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-) else (
-    echo [ERROR] - Ошибка при остановке службы Cryptographic Services
-    echo [ERROR] %TIME% - Ошибка при остановке службы Cryptographic Services >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-    set /a ErrorCount+=1
-)
-
-net stop bits >nul 2>&1
-if !errorlevel! equ 0 (
-    echo [INFO ] - Служба Background Intelligent Transfer Service успешно остановлена
-    echo [INFO ] %TIME% - Служба Background Intelligent Transfer Service успешно остановлена >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-) else (
-    echo [ERROR] - Ошибка при остановке службы Background Intelligent Transfer Service
-    echo [ERROR] %TIME% - Ошибка при остановке службы Background Intelligent Transfer Service >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-    set /a ErrorCount+=1
-)
-
-net stop msiserver >nul 2>&1
-if !errorlevel! equ 0 (
-    echo [INFO ] - Служба Windows Installer успешно остановлена
-    echo [INFO ] %TIME% - Служба Windows Installer успешно остановлена >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-) else (
-    echo [ERROR] - Ошибка при остановке службы Windows Installer
-    echo [ERROR] %TIME% - Ошибка при остановке службы Windows Installer >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-    set /a ErrorCount+=1
+:: Список служб для остановки
+for %%S in ("wuauserv" "cryptSvc" "bits" "msiserver") do (
+    sc stop %%S >nul 2>&1
+    if !errorlevel! equ 0 (
+        echo [INFO ] %TIME% - Служба %%S успешно остановлена >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
+    ) else (
+        echo [ERROR] %TIME% - Ошибка при остановке службы %%S >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
+        set /a ErrorCount+=1
+    )
 )
 
 echo [INFO ] - Очистка папки Центра обновления Windows...
@@ -404,48 +429,20 @@ if !errorlevel! equ 0 (
 md "%systemdrive%\Windows\SoftwareDistribution"
 
 echo [INFO ] - Перезапуск служб, связанных с Центром обновления Windows...
-net start wuauserv >nul 2>&1
-if !errorlevel! equ 0 (
-    echo [INFO ] - Служба Windows Update успешно запущена
-    echo [INFO ] %TIME% - Служба Windows Update успешно запущена >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-) else (
-    echo [ERROR] - Ошибка при запуске службы Windows Update
-    echo [ERROR] %TIME% - Ошибка при запуске службы Windows Update >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-    set /a ErrorCount+=1
+REM Список служб для запуска
+set "ServicesList=wuauserv cryptSvc bits msiserver"
+
+for %%S in (%ServicesList%) do (
+    net start %%S >nul 2>&1
+    if !errorlevel! equ 0 (
+        echo [INFO ] - Служба %%S успешно запущена
+        echo [INFO ] %TIME% - Служба %%S успешно запущена >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
+    ) else (
+        echo [ERROR] - Ошибка при запуске службы %%S
+        echo [ERROR] %TIME% - Ошибка при запуске службы %%S >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
+        set /a ErrorCount+=1
+    )
 )
-
-net start cryptSvc >nul 2>&1
-if !errorlevel! equ 0 (
-    echo [INFO ] - Служба Cryptographic Services успешно запущена
-    echo [INFO ] %TIME% - Служба Cryptographic Services успешно запущена >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-) else (
-    echo [ERROR] - Ошибка при запуске службы Cryptographic Services
-    echo [ERROR] %TIME% - Ошибка при запуске службы Cryptographic Services >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-    set /a ErrorCount+=1
-)
-
-net start bits >nul 2>&1
-if !errorlevel! equ 0 (
-    echo [INFO ] - Служба Background Intelligent Transfer Service успешно запущена
-    echo [INFO ] %TIME% - Служба Background Intelligent Transfer Service успешно запущена >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-) else (
-    echo [ERROR] - Ошибка при запуске службы Background Intelligent Transfer Service
-    echo [ERROR] %TIME% - Ошибка при запуске службы Background Intelligent Transfer Service >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-    set /a ErrorCount+=1
-)
-
-net start msiserver >nul 2>&1
-if !errorlevel! equ 0 (
-    echo [INFO ] - Служба Windows Installer успешно запущена
-    echo [INFO ] %TIME% - Служба Windows Installer успешно запущена >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-) else (
-    echo [ERROR] - Ошибка при запуске службы Windows Installer
-    echo [ERROR] %TIME% - Ошибка при запуске службы Windows Installer >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-    set /a ErrorCount+=1
-)
-rem Очистка папки Центра обновления Windows (конец)
-
-
 
 rem Очистка кэша видеокарты
 wmic path win32_VideoController get name | findstr /i "NVIDIA" >nul
@@ -559,18 +556,14 @@ set /a diff=%free2mb% - %free1mb%
 timeout 1 /nobreak >nul
 cls
 TITLE ASX PC Cleaner %version% beta
+
 echo.
 echo.
-echo.
-echo.
-echo.
-echo                                            %COL%[90m:::      ::::::::  :::    :::          :::    ::: :::    ::: :::::::::
-echo                                         :+: :+:   :+:    :+: :+:    :+:          :+:    :+: :+:    :+: :+:    :+:
-echo                                       +:+   +:+  +:+         +:+  +:+           +:+    +:+ +:+    +:+ +:+    +:+
-echo                                     +#++:++#++: +#++:++#++   +#++:+            +#++:++#++ +#+    +:+ +#++:++#+
-echo                                    +#+     +#+        +#+  +#+  +#+           +#+    +#+ +#+    +#+ +#+    +#+
-echo                                   #+#     #+# #+#    #+# #+#    #+#          #+#    #+# #+#    #+# #+#    #+#
-echo                                  ###     ###  ########  ###    ###          ###    ###  ########  #########
+echo                               %COL%[90m____  ______            ________
+echo                              / __ \/ ____/           / ____/ /__  ____ _____  ___  _____
+echo                             / /_/ / /      ______   / /   / / _ \/ __ `/ __ \/ _ \/ ___/
+echo                            / ____/ /___   /_____/  / /___/ /  __/ /_/ / / / /  __/ / 
+echo                           /_/    \____/            \____/_/\___/\__,_/_/ /_/\___/_/ %COL%[36mbeta%COL%[90m
 echo.
 echo         %COL%[37mОтчет о проделанной очистке%COL%[37m
 echo         ---------------------------
