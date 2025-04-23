@@ -61,7 +61,7 @@ chcp 65001 >nul 2>&1
 setlocal EnableDelayedExpansion
 
 REM ИНФОРМАЦИЯ О ВЕРСИИ
-set "Version=0.1.0"
+set "Version=0.2.0"
 set "VersionNumberCurrent=AP21S1"
 
 set "VersionNumberList=Erorr"
@@ -320,16 +320,39 @@ for %%L in (
 echo Очистка кэша браузеров...
 echo [INFO ] - Очистка кэша браузеров.
 
+
 :: Microsoft Edge
-set "EDGE_USER_DATA=%LOCALAPPDATA%\Microsoft\Edge\User Data"
+taskkill /IM msedge.exe /F >nul 2>&1
 if exist "%EDGE_USER_DATA%\" (
-    call :DelDirectory "%EDGE_USER_DATA%\Default\Cache"
-    call :DelDirectory "%EDGE_USER_DATA%\Default\Code Cache"
-    call :DelDirectory "%EDGE_USER_DATA%\Default\GPUCache"
-    call :DelDirectory "%EDGE_USER_DATA%\Default\Service Worker\CacheStorage"
-    call :DelDirectory "%EDGE_USER_DATA%\Default\Service Worker\ScriptCache"
+    call :DelDirectory "%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Cache"
+    call :DelDirectory "%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Code Cache"
+    call :DelDirectory "%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\GPUCache"
+    call :DelDirectory "%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Service Worker\CacheStorage"
+    call :DelDirectory "%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Service Worker\ScriptCache"
     echo [INFO ] - Папки кэша Edge очищены.
-) else ( echo [INFO ] - Папка данных Edge не найдена. )
+) else ( echo [WARN ] - Папка данных Edge не найдена. )
+
+:: Google Chrome
+taskkill /IM chrome.exe /F >nul 2>&1
+if exist "%CHROME_USER_DATA%\" (
+    call :DelDirectory "%LOCALAPPDATA%\Google\Chrome\User Data\Default\Cache"
+    call :DelDirectory "%LOCALAPPDATA%\Google\Chrome\User Data\Default\Code Cache"
+    call :DelDirectory "%LOCALAPPDATA%\Google\Chrome\User Data\Default\GPUCache"
+    call :DelDirectory "%LOCALAPPDATA%\Google\Chrome\User Data\Default\Service Worker\CacheStorage"
+    call :DelDirectory "%LOCALAPPDATA%\Google\Chrome\User Data\Default\Service Worker\ScriptCache"
+    echo [INFO ] - Папки кэша Chrome очищены.
+) else ( echo [WARN ] - Папка данных Chrome не найдена. )
+
+
+:: Yandex Browser
+taskkill /IM browser.exe /F >nul 2>&1
+if exist "%CHROME_USER_DATA%\" (
+    call :DelDirectory "%LocalAppData%\Yandex\YandexBrowser\User Data\Default\Cache"
+    call :DelDirectory "%LocalAppData%\Yandex\YandexBrowser\User Data\Default\Code Cache"
+    call :DelDirectory "%LocalAppData%\Yandex\YandexBrowser\User Data\Default\GPUCache"
+    call :DelDirectory "%LocalAppData%\Yandex\YandexBrowser\User Data\Default\Media Cache"
+    echo [INFO ] - Папки кэша Yandex очищены.
+) else ( echo [WARN ] - Папка данных Yandex не найдена. )
 
 rem Очистка корзины и удаление файлов 
 chcp 850 >nul 2>&1
@@ -339,50 +362,60 @@ for /f "tokens=*" %%a in ('powershell -Command "Get-ChildItem -Path 'C:\$Recycle
 powershell -Command "Clear-RecycleBin -Confirm:$false -ErrorAction SilentlyContinue"
 chcp 65001 >nul 2>&1
 
-rem удаление файлов
-
+rem удаление мусора
 for %%a in (
-    "%WinDir%\Temp\*.*"
-    "%systemdrive%*.tmp"
-    "%systemdrive%*._mp"
-    "%systemdrive%*.gid"
-    "%SYSTEMDRIVE%\AMD\*.*"
-    "%SYSTEMDRIVE%\NVIDIA\*.*"
-    "%SYSTEMDRIVE%\INTEL\*.*"
-    "%LocalAppData%\Microsoft\Windows\Explorer\thumbcache_*.db"
-    "%LocalAppData%\Microsoft\Windows\Explorer\*.db"
-    "%systemdrive%\*.log"
-    "%systemdrive%\*.old"
-    "%windir%\*.bak"
-    "%windir%\Logs\CBS\CbsPersist*.log"
-    "%windir%\Logs\MoSetup\*.log" "%windir%\Panther\*.log"
-    "%windir%\logs\*.log" "%systemdrive%\*.trace"
-    "%WinDir%\Prefetch\*.*"
-    "%Temp%\*.*"
-    "%AppData%\Temp\*.*"
-    "%AppData%\Microsoft\Windows\Recent\*"
-    "%HomePath%\AppData\LocalLow\Temp\*.*"
-    "%LocalAppData%\Microsoft\Windows\INetCache\."
-    "%AppData%\Local\Microsoft\Windows\INetCookies\."
-    "%AppData%\Discord\Cache\."
-    "%AppData%\Discord\Code Cache\."
-    "%ProgramFiles(x86)%\Steam\Dumps"
-    "%ProgramFiles(x86)%\Steam\Traces"
-    "%ProgramFiles(x86)%\Steam\appcache\*.log"
-    "%localappdata%\Microsoft\Windows\WebCache\*.log"
-    "%ProgramData%\Microsoft\Windows Defender\Network Inspection System\Support\*.log"
-    "%ProgramData%\Microsoft\Windows Defender\Scans\History\CacheManager"
-    "%ProgramData%\Microsoft\Windows Defender\Scans\History\ReportLatency\Latency"
-    "%ProgramData%\Microsoft\Windows Defender\Scans\History\Service\*.log" 
-    "%ProgramData%\Microsoft\Windows Defender\Scans\MetaStore"
-    "%ProgramData%\Microsoft\Windows Defender\Support"
-    "%ProgramData%\Microsoft\Windows Defender\Scans\History\Results\Quick"
-    "%ProgramData%\Microsoft\Windows Defender\Scans\History\Results\Resource"
-    "%windir%\Minidump\*.dmp"
-    "%windir%\LiveKernelReports\*.dmp"
-    "%windir%\LiveKernelReports\WATCHDOG\*.dmp"
-    "%windir%\LiveKernelReports\WHEA\*.dmp"
-    "%localappdata%\CrashDumps\*.dmp"
+"%WinDir%\Temp\*.*"
+"%systemdrive%*.tmp"
+"%systemdrive%*.temp"
+"%systemdrive%*.temp*"
+"%systemdrive%*.chk"
+"%systemdrive%*._mp"
+"%systemdrive%*.gid"
+"%SYSTEMDRIVE%\Windows\SoftwareDistribution\Download\*.*"
+"%SYSTEMDRIVE%\Windows\SoftwareDistribution\DataStore\*.*"
+"%WinDir%\Installer\$PatchCache$\*.*"
+"%SYSTEMDRIVE%\AMD\*.*"
+"%SYSTEMDRIVE%\NVIDIA\*.*"
+"%SYSTEMDRIVE%\INTEL\*.*"
+"%LocalAppData%\Microsoft\Windows\Explorer\thumbcache_*.db"
+"%LocalAppData%\Microsoft\Windows\Explorer\*.db"
+"%systemdrive%\*.log"
+"%systemdrive%\*.old"
+"%windir%\*.bak"
+"%windir%\Logs\CBS\CbsPersist*.log"
+"%windir%\Logs\DISM\dism.log"
+"%windir%\Logs\MoSetup\*.log"
+"%windir%\Panther\*.log"
+"%windir%\logs\*.log"
+"%systemdrive%\*.trace"
+"%WinDir%\Prefetch\*.*"
+"%Temp%\*.*"
+"%AppData%\Temp\*.*"
+"%UserProfile%\Downloads\*.crdownload"
+"%AppData%\Microsoft\Windows\Recent\*"
+"%HomePath%\AppData\LocalLow\Temp\*.*"
+"%LocalAppData%\Microsoft\Windows\INetCache\."
+"%AppData%\Local\Microsoft\Windows\INetCookies\."
+"%AppData%\Discord\Cache\."
+"%AppData%\Discord\Code Cache\."
+"%ProgramFiles(x86)%\Steam\Dumps"
+"%ProgramFiles(x86)%\Steam\Traces"
+"%ProgramFiles(x86)%\Steam\appcache\*.log"
+"%localappdata%\Microsoft\Windows\WebCache\*.log"
+"%ProgramData%\Microsoft\Windows Defender\Network Inspection System\Support\*.*"
+"%ProgramData%\Microsoft\Windows Defender\Scans\History\CacheManager\*.log"
+"%ProgramData%\Microsoft\Windows Defender\Scans\History\ReportLatency\Latency\*.log"
+"%ProgramData%\Microsoft\Windows Defender\Scans\History\Service\*.log"
+"%ProgramData%\Microsoft\Windows Defender\Scans\MetaStore\*.log"
+"%ProgramData%\Microsoft\Windows Defender\Scans\History\*.*"
+"%ProgramData%\Microsoft\Windows Defender\Support\*.*"
+"%ProgramData%\Microsoft\Windows Defender\Scans\History\Results\Quick\*.log"
+"%ProgramData%\Microsoft\Windows Defender\Scans\History\Results\Resource\*.log"
+"%windir%\Minidump\*.dmp"
+"%windir%\LiveKernelReports\*.dmp"
+"%windir%\LiveKernelReports\WATCHDOG\*.dmp"
+"%windir%\LiveKernelReports\WHEA\*.dmp"
+"%localappdata%\CrashDumps\*.dmp"
 ) do (
     if exist "%%a" (
         del /s /f /q "%%a" >nul 2>&1
@@ -421,15 +454,15 @@ for %%a in (
     "%ProgramFiles(x86)%\Steam\logs"
 ) do (
     if exist "%%a" (
-        echo [INFO ] - Удаление файлов в папке: %%a
+        echo [INFO ] - Удаление папки: %%a
         del /s /q "%%a\*.*" >nul 2>&1
         if !errorlevel! equ 0 (
-            echo [INFO ] - Файлы в папке %%a успешно удалены
-            echo [INFO ] %TIME% - Файлы в папке %%a успешно удалены >> %LogFile%
-            set /a DelFileCount+=1
+            echo [INFO ] - Папка %%a успешно удалена
+            echo [INFO ] %TIME% - Папка %%a успешно удалена >> %LogFile%
+            set /a DelFolderCount+=1
         ) else (
-            echo [ERROR] - Не удалось удалить файлы в папке: %%a
-            echo [ERROR] %TIME% - Не удалось удалить файлы в папке %%a >> %LogFile%
+            echo [ERROR] - Не удалось удалить папку: %%a
+            echo [ERROR] %TIME% - Не удалось удалить папку %%a >> %LogFile%
             set /a ErrorCount+=1
         )
     ) else (
@@ -598,26 +631,26 @@ echo                             / /_/ / /      ______   / /   / / _ \/ __ `/ __
 echo                            / ____/ /___   /_____/  / /___/ /  __/ /_/ / / / /  __/ / 
 echo                           /_/    \____/            \____/_/\___/\__,_/_/ /_/\___/_/ %COL%[36mAlpha%COL%[90m
 echo.
-echo         %COL%[37mОтчет о проделанной очистке%COL%[37m
-echo         ---------------------------
+echo                           %COL%[37mОтчет о проделанной очистке%COL%[37m
+echo                           ---------------------------
 echo.
-echo         %COL%[92mПроцесс очистки завершен
-echo         %COL%[93mУдалено %DelFileCount% файлов и %DelFolderCount% папок%COL%[37m
-echo         %COL%[92mОчищено места: ~%diff% МБ
-echo         %COL%[31mПроизошло ошибок: %ErrorCount%%COL%[37m
+echo                           %COL%[92mПроцесс очистки завершен
+echo                           %COL%[93mУдалено %DelFileCount% файлов и %DelFolderCount% папок%COL%[37m
+echo                           %COL%[92mОчищено места: ~%diff% МБ
+REM echo                           %COL%[31mПроизошло ошибок: %ErrorCount%%COL%[37m
 echo.
 echo.
 echo         %COL%[90mВы вернётесь назад автоматически через 10 секунд.
+echo  %TIME% - Отчет о проделанной очистки >> "%ASX-Directory%\Files\Logs\%date%.txt"
+echo  %TIME% - Удалено %DelFileCount% файлов и %DelFolderCount% папок >> "%ASX-Directory%\Files\Logs\%date%.txt"
+echo  %TIME% - Всего ошибок при удалении файлов/папок: %ErrorCount% >> "%ASX-Directory%\Files\Logs\%date%.txt"
+echo  %TIME% - Завершено ASX_cleaner >> "%ASX-Directory%\Files\Logs\%date%.txt"
 timeout 11 /nobreak >nul
-echo [INFO ] %TIME% - Отчет о проделанной очистки >> "%ASX-Directory%\Files\Logs\%date%.txt"
-echo [INFO ] %TIME% - Удалено %DelFileCount% файлов и %DelFolderCount% папок >> "%ASX-Directory%\Files\Logs\%date%.txt"
-echo [INFO ] %TIME% - Всего ошибок при удалении файлов/папок: %ErrorCount% >> "%ASX-Directory%\Files\Logs\%date%.txt"
-echo [INFO ] %TIME% - Завершено ASX_cleaner >> "%ASX-Directory%\Files\Logs\%date%.txt"
 REM Дублирование логов в логи ASX_cleaner
-echo [INFO ] %TIME% - Отчет о проделанной очистки >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-echo [INFO ] %TIME% - Удалено %DelFileCount% файлов и %DelFolderCount% папок >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-echo [INFO ] %TIME% - Всего ошибок при удалении файлов/папок: %ErrorCount% >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
-echo [INFO ] %TIME% - Завершено ASX_cleaner >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
+echo  %TIME% - Отчет о проделанной очистки >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
+echo  %TIME% - Удалено %DelFileCount% файлов и %DelFolderCount% папок >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
+echo  %TIME% - Всего ошибок при удалении файлов/папок: %ErrorCount% >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
+echo  %TIME% - Завершено ASX_cleaner >> "%ASX-Directory%\Files\Logs\ASX_cleaner\%date%.txt"
 goto ASX_cleaner
 
 :DelDirectory
