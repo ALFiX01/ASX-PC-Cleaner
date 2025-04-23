@@ -62,7 +62,7 @@ setlocal EnableDelayedExpansion
 
 REM ИНФОРМАЦИЯ О ВЕРСИИ
 set "Version=0.2.0"
-set "VersionNumberCurrent=AP21S1"
+set "VersionNumberCurrent=AP23S1"
 
 set "VersionNumberList=Erorr"
 set "UPDVER=Erorr"
