@@ -267,9 +267,8 @@ for %%P in (
     "ccleaner64.exe"
     "ccleaner.exe"
     "msedge.exe"
+    "browser.exe"
     "firefox.exe"
-    "vivaldi.exe"
-    "brave.exe"
     "chrome.exe"
     "Acrotray.exe"
     "GoogleUpdate.exe"
@@ -322,7 +321,6 @@ echo [INFO ] - Очистка кэша браузеров.
 
 
 :: Microsoft Edge
-taskkill /IM msedge.exe /F >nul 2>&1
 if exist "%EDGE_USER_DATA%\" (
     call :DelDirectory "%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Cache"
     call :DelDirectory "%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Code Cache"
@@ -333,7 +331,6 @@ if exist "%EDGE_USER_DATA%\" (
 ) else ( echo [WARN ] - Папка данных Edge не найдена. )
 
 :: Google Chrome
-taskkill /IM chrome.exe /F >nul 2>&1
 if exist "%CHROME_USER_DATA%\" (
     call :DelDirectory "%LOCALAPPDATA%\Google\Chrome\User Data\Default\Cache"
     call :DelDirectory "%LOCALAPPDATA%\Google\Chrome\User Data\Default\Code Cache"
@@ -345,7 +342,6 @@ if exist "%CHROME_USER_DATA%\" (
 
 
 :: Yandex Browser
-taskkill /IM browser.exe /F >nul 2>&1
 if exist "%CHROME_USER_DATA%\" (
     call :DelDirectory "%LocalAppData%\Yandex\YandexBrowser\User Data\Default\Cache"
     call :DelDirectory "%LocalAppData%\Yandex\YandexBrowser\User Data\Default\Code Cache"
@@ -398,9 +394,6 @@ for %%a in (
 "%AppData%\Local\Microsoft\Windows\INetCookies\."
 "%AppData%\Discord\Cache\."
 "%AppData%\Discord\Code Cache\."
-"%ProgramFiles(x86)%\Steam\Dumps"
-"%ProgramFiles(x86)%\Steam\Traces"
-"%ProgramFiles(x86)%\Steam\appcache\*.log"
 "%localappdata%\Microsoft\Windows\WebCache\*.log"
 "%ProgramData%\Microsoft\Windows Defender\Network Inspection System\Support\*.*"
 "%ProgramData%\Microsoft\Windows Defender\Scans\History\CacheManager\*.log"
@@ -470,6 +463,30 @@ for %%a in (
         echo [WARN ] %TIME% - Папка %%a не существует >> %LogFile%
     )
 )
+
+
+:: --------------------Clear Steam dumps---------------------
+echo --- Очистка дампов Steam
+:: Clear directory contents  : "%PROGRAMFILES(X86)%\Steam\Dumps"
+chcp 850 >nul 2>&1
+PowerShell -ExecutionPolicy Unrestricted -Command "$pathGlobPattern = "^""$($directoryGlob = '%PROGRAMFILES(X86)%\Steam\Dumps'; if ($directoryGlob.EndsWith('\*')) { $directoryGlob } elseif ($directoryGlob.EndsWith('\')) { "^""$($directoryGlob)*"^"" } else { "^""$($directoryGlob)\*"^"" } )"^""; $expandedPath = [System.Environment]::ExpandEnvironmentVariables($pathGlobPattern); Write-Host "^""Searching for items matching pattern: `"^""$($expandedPath)`"^""."^""; $deletedCount = 0; $failedCount = 0; $foundAbsolutePaths = @(); Write-Host 'Iterating files and directories recursively.'; try { $foundAbsolutePaths += @(; Get-ChildItem -Path $expandedPath -Force -Recurse -ErrorAction Stop | Select-Object -ExpandProperty FullName; ); } catch [System.Management.Automation.ItemNotFoundException] { <# Swallow, do not run `Test-Path` before, it's unreliable for globs requiring extra permissions #>; }; try { $foundAbsolutePaths += @(; Get-Item -Path $expandedPath -ErrorAction Stop | Select-Object -ExpandProperty FullName; ); } catch [System.Management.Automation.ItemNotFoundException] { <# Swallow, do not run `Test-Path` before, it's unreliable for globs requiring extra permissions #>; }; $foundAbsolutePaths = $foundAbsolutePaths | Select-Object -Unique | Sort-Object -Property { $_.Length } -Descending; if (!$foundAbsolutePaths) { Write-Host 'Skipping, no items available.'; exit 0; }; Write-Host "^""Initiating processing of $($foundAbsolutePaths.Count) items from `"^""$expandedPath`"^""."^""; foreach ($path in $foundAbsolutePaths) { if (-not (Test-Path $path)) { <# Re-check existence as prior deletions might remove subsequent items (e.g., subdirectories). #>; Write-Host "^""Successfully deleted: $($path) (already deleted)."^""; $deletedCount++; continue; }; try { Remove-Item -Path $path -Force -Recurse -ErrorAction Stop; $deletedCount++; Write-Host "^""Successfully deleted: $($path)"^""; } catch { $failedCount++; Write-Warning "^""Unable to delete $($path): $_"^""; }; }; Write-Host "^""Successfully deleted $($deletedCount) items."^""; if ($failedCount -gt 0) { Write-Warning "^""Failed to delete $($failedCount) items."^""; }"
+chcp 65001 >nul 2>&1
+
+:: --------------------Clear Steam traces--------------------
+echo --- Очистка следов Steam
+:: Clear directory contents  : "%PROGRAMFILES(X86)%\Steam\Traces"
+chcp 850 >nul 2>&1
+PowerShell -ExecutionPolicy Unrestricted -Command "$pathGlobPattern = "^""$($directoryGlob = '%PROGRAMFILES(X86)%\Steam\Traces'; if ($directoryGlob.EndsWith('\*')) { $directoryGlob } elseif ($directoryGlob.EndsWith('\')) { "^""$($directoryGlob)*"^"" } else { "^""$($directoryGlob)\*"^"" } )"^""; $expandedPath = [System.Environment]::ExpandEnvironmentVariables($pathGlobPattern); Write-Host "^""Searching for items matching pattern: `"^""$($expandedPath)`"^""."^""; $deletedCount = 0; $failedCount = 0; $foundAbsolutePaths = @(); Write-Host 'Iterating files and directories recursively.'; try { $foundAbsolutePaths += @(; Get-ChildItem -Path $expandedPath -Force -Recurse -ErrorAction Stop | Select-Object -ExpandProperty FullName; ); } catch [System.Management.Automation.ItemNotFoundException] { <# Swallow, do not run `Test-Path` before, it's unreliable for globs requiring extra permissions #>; }; try { $foundAbsolutePaths += @(; Get-Item -Path $expandedPath -ErrorAction Stop | Select-Object -ExpandProperty FullName; ); } catch [System.Management.Automation.ItemNotFoundException] { <# Swallow, do not run `Test-Path` before, it's unreliable for globs requiring extra permissions #>; }; $foundAbsolutePaths = $foundAbsolutePaths | Select-Object -Unique | Sort-Object -Property { $_.Length } -Descending; if (!$foundAbsolutePaths) { Write-Host 'Skipping, no items available.'; exit 0; }; Write-Host "^""Initiating processing of $($foundAbsolutePaths.Count) items from `"^""$expandedPath`"^""."^""; foreach ($path in $foundAbsolutePaths) { if (-not (Test-Path $path)) { <# Re-check existence as prior deletions might remove subsequent items (e.g., subdirectories). #>; Write-Host "^""Successfully deleted: $($path) (already deleted)."^""; $deletedCount++; continue; }; try { Remove-Item -Path $path -Force -Recurse -ErrorAction Stop; $deletedCount++; Write-Host "^""Successfully deleted: $($path)"^""; } catch { $failedCount++; Write-Warning "^""Unable to delete $($path): $_"^""; }; }; Write-Host "^""Successfully deleted $($deletedCount) items."^""; if ($failedCount -gt 0) { Write-Warning "^""Failed to delete $($failedCount) items."^""; }"
+chcp 65001 >nul 2>&1
+
+:: --------------------Clear Steam cache---------------------
+echo --- Очистка кеша Steam
+:: Clear directory contents  : "%ProgramFiles(x86)%\Steam\appcache"
+chcp 850 >nul 2>&1
+PowerShell -ExecutionPolicy Unrestricted -Command "$pathGlobPattern = "^""$($directoryGlob = '%ProgramFiles(x86)%\Steam\appcache'; if ($directoryGlob.EndsWith('\*')) { $directoryGlob } elseif ($directoryGlob.EndsWith('\')) { "^""$($directoryGlob)*"^"" } else { "^""$($directoryGlob)\*"^"" } )"^""; $expandedPath = [System.Environment]::ExpandEnvironmentVariables($pathGlobPattern); Write-Host "^""Searching for items matching pattern: `"^""$($expandedPath)`"^""."^""; $deletedCount = 0; $failedCount = 0; $foundAbsolutePaths = @(); Write-Host 'Iterating files and directories recursively.'; try { $foundAbsolutePaths += @(; Get-ChildItem -Path $expandedPath -Force -Recurse -ErrorAction Stop | Select-Object -ExpandProperty FullName; ); } catch [System.Management.Automation.ItemNotFoundException] { <# Swallow, do not run `Test-Path` before, it's unreliable for globs requiring extra permissions #>; }; try { $foundAbsolutePaths += @(; Get-Item -Path $expandedPath -ErrorAction Stop | Select-Object -ExpandProperty FullName; ); } catch [System.Management.Automation.ItemNotFoundException] { <# Swallow, do not run `Test-Path` before, it's unreliable for globs requiring extra permissions #>; }; $foundAbsolutePaths = $foundAbsolutePaths | Select-Object -Unique | Sort-Object -Property { $_.Length } -Descending; if (!$foundAbsolutePaths) { Write-Host 'Skipping, no items available.'; exit 0; }; Write-Host "^""Initiating processing of $($foundAbsolutePaths.Count) items from `"^""$expandedPath`"^""."^""; foreach ($path in $foundAbsolutePaths) { if (-not (Test-Path $path)) { <# Re-check existence as prior deletions might remove subsequent items (e.g., subdirectories). #>; Write-Host "^""Successfully deleted: $($path) (already deleted)."^""; $deletedCount++; continue; }; try { Remove-Item -Path $path -Force -Recurse -ErrorAction Stop; $deletedCount++; Write-Host "^""Successfully deleted: $($path)"^""; } catch { $failedCount++; Write-Warning "^""Unable to delete $($path): $_"^""; }; }; Write-Host "^""Successfully deleted $($deletedCount) items."^""; if ($failedCount -gt 0) { Write-Warning "^""Failed to delete $($failedCount) items."^""; }"
+chcp 65001 >nul 2>&1
+:: ----------------------------------------------------------
+
 
 :: Список служб для остановки
 for %%S in ("wuauserv" "cryptSvc" "bits" "msiserver") do (
